@@ -1,5 +1,11 @@
 # Supabase setup: step by step
 
+> **Status of `herblocx-dev` (2026-10-15):** Claude already created the project, applied the 4 database files and
+> deployed the app to https://herblocx-tracker.vercel.app using the Supabase and Vercel connectors.
+> Project ref: `ieieeklmyircdgjduvkx`. `.env.local` already holds the URL and publishable key.
+> **Still to do by you:** Part B (sign-ups off), paste the secret key (Part C step 3) into `.env.local`
+> and into Vercel, then Part F (seed). The full guide below stays as the recipe for the live project in Phase 5.
+
 This sets up the **development & testing** project, `herblocx-dev`. You'll repeat the same steps for the live project (`herblocx-prod`) in Phase 5.
 
 Time needed: about 20 minutes. Supabase sometimes renames buttons slightly. If something looks different, look for the closest match, or stop and ask.
