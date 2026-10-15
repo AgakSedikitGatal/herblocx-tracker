@@ -11,3 +11,10 @@ out/
 
 # OS
 .DS_Store
+
+# Generated passwords from the seed script: never commit
+*.local.md
+
+# TypeScript / Next.js generated
+*.tsbuildinfo
+next-env.d.ts

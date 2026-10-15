@@ -31,7 +31,7 @@ Checked on npm on 2026-10-15. Only stable releases. Every version is pinned exac
 | @supabase/supabase-js | 2.117.3 | |
 | @supabase/ssr | 0.12.7 | Official helper that handles Supabase logins in Next.js. Still numbered 0.x, but it is Supabase's documented, recommended package. |
 | tailwindcss / @tailwindcss/postcss | 4.3.3 | |
-| shadcn (CLI) | 4.21.5 | Copies UI components into our code. It also installs its normal helpers: `radix-ui`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react` (icons), `tw-animate-css`. I count these as part of "shadcn/ui". Say so if you disagree. |
+| shadcn (CLI, dev-only) | 4.21.5 | Copies UI components into our code (Radix base). Its standard helpers, as installed by shadcn itself: `radix-ui` 1.8.1, `class-variance-authority` 0.7.1, `cn` 0.4.0 (shadcn's own class-name helper, which replaced `clsx` + `tailwind-merge`), `lucide-react` 1.57.0 (icons), `tw-animate-css` 1.4.0. |
 | eslint | **9.39.5** | Not 10.x. Several plugins inside `eslint-config-next` don't officially support ESLint 10 yet. |
 | eslint-config-next | 16.4.1 | Matches Next.js. |
 | @types/node | 22.20.5 | Matches Node 22. |
@@ -56,12 +56,12 @@ All tables live in Supabase Postgres. **Row Level Security (RLS) is ON for every
 
 | Table | What it stores | Key columns |
 |---|---|---|
-| `profiles` | One row per person, linked 1-to-1 to the Supabase login account | `id` (= login user id), `full_name`, `email`, `job_role` (Director / Head of Finance / Finance / Marketing / Software Dev / Legal), `is_admin` (yes/no, separate from job role), `is_active` (yes/no), `created_at`, `updated_at` |
+| `profiles` | One row per person, linked 1-to-1 to the Supabase login account | `id` (= login user id), `full_name`, `email`, `job_role` (Director / Head of Finance / Finance / Marketing / Software Dev / Legal), `is_admin` (yes/no, separate from job role), `is_active` (yes/no; **new accounts start switched off** until the Admin page or seed script switches them on), `created_at`, `updated_at` |
 | `milestones` | Project milestones | `id`, `title`, `description`, `start_date`, `end_date`, `owner_id` → profiles, `created_by`, `created_at`, `updated_at` |
 | `tasks` | Kanban cards | `id`, `title`, `description`, `status` (To Do / In Progress / Review / Done), `assignee_id` → profiles (can be empty), `department` (one of the 6 job roles), `priority` (Low / Medium / High / Urgent), `due_date`, `milestone_id` → milestones (can be empty), `created_by`, `created_at`, `updated_at` |
 | `task_comments` | Comment thread per task | `id`, `task_id`, `author_id`, `body`, `created_at`, `edited_at` |
 | `task_attachments` | Links and uploaded files | `id`, `task_id`, `kind` (link / file), `url` (for links), `storage_path` + `file_name` + `size_bytes` (for files), `added_by`, `created_at` |
-| `activity_log` | Append-only history | `id`, `task_id`, `actor_id`, `action` (task_created, task_updated, status_changed, reassigned, task_deleted, commented, attachment_added, attachment_removed), `details` (what changed: old value → new value), `created_at` |
+| `activity_log` | Append-only history | `id`, `task_id`, `actor_id`, `action` (task_created, task_updated, status_changed, reassigned, task_deleted, commented, comment_edited, comment_deleted, attachment_added, attachment_removed). Comment text is never copied into the log., `details` (what changed: old value → new value), `created_at` |
 
 **Computed, not stored** (database views, so the numbers can never get out of sync):
 - `milestone_progress`: for each milestone, Done tasks ÷ all tasks, as a percentage. A milestone with no tasks shows 0%.
@@ -186,10 +186,10 @@ Every phase ends with: what was done, plain-language browser test steps, a git c
 | Phase | Delivers |
 |---|---|
 | 0 | This plan (no code) |
-| 1 | Project setup; your step-by-step Supabase setup guide; schema + RLS as SQL migration files; login/logout/change password; Admin user page; seed script (1 Admin + 1 account per job role) |
+| 1 | Project setup; **the complete database (all tables, permission rules, log triggers, file storage)**; your step-by-step Supabase setup guide; schema + RLS as SQL migration files; login/logout/change password; Admin user page; seed script (1 Admin + 1 account per job role) |
 | 2 | Milestones, timeline view, kanban board with drag and drop and filters (assignee, role, milestone, overdue) |
-| 3 | Comments + activity log written by database triggers |
-| 4 | Dashboard + attachments |
+| 3 | Comments screen + activity log screen (the log triggers already exist from Phase 1) |
+| 4 | Dashboard + attachments screens (storage bucket and rules already exist from Phase 1) |
 | 5 | Automated "forbidden action" tests per role; build/lint/typecheck at zero errors; Vercel deploy guide; README (add users, backups, run locally) |
 
 ---
@@ -231,4 +231,4 @@ Every phase ends with: what was done, plain-language browser test steps, a git c
 
 ---
 
-*Next: Phase 1 starts when the owner says "lanjut".*
+*Phase 1 started 2026-10-15.*
