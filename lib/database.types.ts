@@ -278,25 +278,6 @@ export type Database = {
       }
     }
     Functions: {
-      can_delete_task: {
-        Args: { p_department: Database["public"]["Enums"]["job_role"] }
-        Returns: boolean
-      }
-      can_edit_task: {
-        Args: {
-          p_assignee_id: string
-          p_created_by: string
-          p_department: Database["public"]["Enums"]["job_role"]
-        }
-        Returns: boolean
-      }
-      can_manage_milestones: { Args: never; Returns: boolean }
-      current_job_role: {
-        Args: never
-        Returns: Database["public"]["Enums"]["job_role"]
-      }
-      is_active_user: { Args: never; Returns: boolean }
-      is_admin: { Args: never; Returns: boolean }
       jakarta_today: { Args: never; Returns: string }
     }
     Enums: {
