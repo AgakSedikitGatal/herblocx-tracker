@@ -15,6 +15,7 @@ import { getPeople } from "@/lib/people";
 import { canManageMilestones } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Timeline } from "./timeline";
+import { MilestoneViewTabs } from "./view-tabs";
 
 export default async function MilestonesPage() {
   const viewer = await requireProfile();
@@ -48,6 +49,7 @@ export default async function MilestonesPage() {
           </Button>
         )}
       </div>
+      <MilestoneViewTabs active="timeline" />
 
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">No milestones yet.</p>

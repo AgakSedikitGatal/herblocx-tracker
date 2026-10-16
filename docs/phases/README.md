@@ -11,6 +11,12 @@ One document per development phase. Each has a plain-language part for users and
 | 4 | Dashboard and attachments (links + 10 MB private uploads) | ✅ Done (2026-10-16) | [PHASE-4.md](PHASE-4.md) |
 | 5 | Hardening: 122 automated permission tests, security tidy-up, live database, backups, deploy guide, README | ✅ Done (2026-10-16) | [PHASE-5.md](PHASE-5.md) |
 
+## Additions after Phase 5
+
+| # | Topic | Status | Document |
+|---|---|---|---|
+| 1 | Milestones **Calendar** tab: Google-Calendar-style month view, filled in automatically from task due dates and milestone end dates | ✅ Done (2026-10-16) | [ADDITION-1-CALENDAR.md](ADDITION-1-CALENDAR.md) |
+
 ## Where things are
 
 | What | Where |
