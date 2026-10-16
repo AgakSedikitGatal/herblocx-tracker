@@ -6,13 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireProfile } from "@/lib/auth";
 import { actorName, describeActivity } from "@/lib/activity";
+import { formatBytes } from "@/lib/attachments";
 import { jobRoleLabel, taskPriorityLabel, taskStatusLabel } from "@/lib/constants";
 import { formatDate, formatDateTime, jakartaToday } from "@/lib/format";
 import { getPeople } from "@/lib/people";
-import { canDeleteTask, canEditTask } from "@/lib/permissions";
+import { canDeleteAttachment, canDeleteTask, canEditTask } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { deleteTask, updateTask } from "../actions";
 import { TaskForm } from "../task-form";
+import { Attachments } from "./attachments";
 import { Comments } from "./comments";
 
 export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
@@ -20,8 +22,14 @@ export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: task }, people, { data: milestones }, { data: comments }, { data: history }] =
-    await Promise.all([
+  const [
+    { data: task },
+    people,
+    { data: milestones },
+    { data: comments },
+    { data: history },
+    { data: attachments },
+  ] = await Promise.all([
       supabase.from("tasks").select("*").eq("id", id).maybeSingle(),
       getPeople(supabase),
       supabase.from("milestones").select("id, title").order("start_date"),
@@ -32,6 +40,7 @@ export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
         .eq("task_id", id)
         .order("id", { ascending: false })
         .limit(200),
+      supabase.from("task_attachments").select("*").eq("task_id", id).order("created_at"),
     ]);
   if (!task) notFound();
 
@@ -113,6 +122,30 @@ export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
               </p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Attachments</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Attachments
+            taskId={task.id}
+            attachments={(attachments ?? []).map((a) => ({
+              id: a.id,
+              kind: a.kind,
+              name: a.name,
+              href: a.kind === "link" && a.url ? a.url : `/attachments/${a.id}`,
+              detail:
+                a.kind === "link" && a.url
+                  ? (URL.canParse(a.url) ? new URL(a.url).hostname : "")
+                  : formatBytes(a.size_bytes ?? 0),
+              addedBy: people.nameOf(a.added_by) ?? "Unknown",
+              addedAt: formatDateTime(a.created_at),
+              canDelete: canDeleteAttachment(viewer, a),
+            }))}
+          />
         </CardContent>
       </Card>
 

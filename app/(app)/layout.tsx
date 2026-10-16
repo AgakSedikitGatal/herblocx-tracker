@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Link href="/" className="text-muted-foreground hover:text-foreground">
-              Home
+              Dashboard
             </Link>
             <Link href="/board" className="text-muted-foreground hover:text-foreground">
               Board

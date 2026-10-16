@@ -41,3 +41,7 @@ export function canDeleteTask(viewer: Viewer, task: TaskLike) {
       FINANCE_DEPARTMENTS.includes(task.department))
   );
 }
+
+export function canDeleteAttachment(viewer: Viewer, attachment: { added_by: string }) {
+  return viewer.is_admin || viewer.job_role === "director" || attachment.added_by === viewer.id;
+}

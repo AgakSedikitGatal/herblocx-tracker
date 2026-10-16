@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { FormState } from "@/components/form-message";
+import { ATTACHMENT_BUCKET } from "@/lib/attachments";
 import { getAuthState } from "@/lib/auth";
 import {
   JOB_ROLE_VALUES,
@@ -58,6 +59,7 @@ function revalidateTaskPages(taskId?: string) {
   revalidatePath("/board");
   revalidatePath("/milestones", "layout");
   revalidatePath("/activity");
+  revalidatePath("/");
   if (taskId) revalidatePath(`/tasks/${taskId}`);
 }
 
@@ -124,9 +126,19 @@ export async function moveTask(taskId: string, status: Enums<"task_status">): Pr
 
 export async function deleteTask(taskId: string): Promise<FormState> {
   const supabase = await createClient();
+  const { data: files } = await supabase
+    .from("task_attachments")
+    .select("storage_path")
+    .eq("task_id", taskId)
+    .eq("kind", "file");
+
   const { data, error } = await supabase.from("tasks").delete().eq("id", taskId).select("id");
   if (error) return { error: describeDbError(error, "delete the task") };
   if (!data.length) return { error: "You don't have permission to delete this task." };
+
+  // Deleting the task removed its attachment records; now remove the uploaded files too.
+  const paths = (files ?? []).map((f) => f.storage_path).filter((p): p is string => !!p);
+  if (paths.length) await supabase.storage.from(ATTACHMENT_BUCKET).remove(paths);
 
   revalidateTaskPages();
   redirect("/board");

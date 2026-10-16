@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { ActivityList } from "@/components/activity-list";
 import { Button } from "@/components/ui/button";
-import { actorName, describeActivity } from "@/lib/activity";
+import { toActivityRows } from "@/lib/activity-rows";
 import { requireProfile } from "@/lib/auth";
-import { formatDateTime } from "@/lib/format";
 import { getPeople } from "@/lib/people";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,27 +15,16 @@ export default async function ActivityPage({ searchParams }: PageProps<"/activit
   const from = (page - 1) * PAGE_SIZE;
 
   const supabase = await createClient();
-  const [{ data: entries, count }, people, { data: milestones }] = await Promise.all([
+  const [{ data: entries, count }, people] = await Promise.all([
     supabase
       .from("activity_log")
       .select("*", { count: "exact" })
       .order("id", { ascending: false })
       .range(from, from + PAGE_SIZE - 1),
     getPeople(supabase),
-    supabase.from("milestones").select("id, title"),
   ]);
-
-  // Which of the tasks mentioned still exist (deleted ones get no link).
-  const taskIds = [...new Set((entries ?? []).map((e) => e.task_id).filter((id): id is string => !!id))];
-  const { data: liveTasks } = taskIds.length
-    ? await supabase.from("tasks").select("id").in("id", taskIds)
-    : { data: [] };
-  const live = new Set((liveTasks ?? []).map((t) => t.id));
-
-  const milestoneName = new Map((milestones ?? []).map((m) => [m.id, m.title]));
-  const lookups = { nameOf: people.nameOf, milestoneTitle: (id: string) => milestoneName.get(id) };
-  const total = count ?? 0;
-  const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const rows = await toActivityRows(supabase, entries ?? [], people);
+  const lastPage = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
     <div className="grid gap-4">
@@ -48,17 +36,7 @@ export default async function ActivityPage({ searchParams }: PageProps<"/activit
         </p>
       </div>
 
-      <ActivityList
-        showTask
-        rows={(entries ?? []).map((entry) => ({
-          id: entry.id,
-          actor: actorName(entry, lookups),
-          sentence: describeActivity(entry, lookups),
-          when: formatDateTime(entry.created_at),
-          taskTitle: entry.task_title,
-          taskHref: entry.task_id && live.has(entry.task_id) ? `/tasks/${entry.task_id}` : null,
-        }))}
-      />
+      <ActivityList showTask rows={rows} />
 
       {lastPage > 1 && (
         <nav className="flex items-center gap-3 text-sm" aria-label="Pages">
