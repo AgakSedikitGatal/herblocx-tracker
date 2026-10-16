@@ -15,10 +15,11 @@ import { getPeople } from "@/lib/people";
 import { canManageMilestones } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Timeline } from "./timeline";
-import { MilestoneViewTabs } from "./view-tabs";
+import { MonthCalendar } from "./month-calendar";
 
-export default async function MilestonesPage() {
+export default async function MilestonesPage({ searchParams }: PageProps<"/milestones">) {
   const viewer = await requireProfile();
+  const { month } = await searchParams;
   const supabase = await createClient();
 
   const [{ data: milestones }, { data: progress }, people] = await Promise.all([
@@ -49,8 +50,9 @@ export default async function MilestonesPage() {
           </Button>
         )}
       </div>
-      <MilestoneViewTabs active="timeline" />
+      <MonthCalendar monthParam={month} />
 
+      <h2 className="pt-2 text-lg font-medium">Timeline and progress</h2>
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">No milestones yet.</p>
       ) : (

@@ -15,7 +15,7 @@ One document per development phase. Each has a plain-language part for users and
 
 | # | Topic | Status | Document |
 |---|---|---|---|
-| 1 | Milestones **Calendar** tab: Google-Calendar-style month view, filled in automatically from task due dates and milestone end dates | ✅ Done (2026-10-16) | [ADDITION-1-CALENDAR.md](ADDITION-1-CALENDAR.md) |
+| 1 | Milestones **calendar** (top of the Milestones page): Google-Calendar-style month view, filled in automatically from task due dates and milestone end dates | ✅ Done (2026-10-16) | [ADDITION-1-CALENDAR.md](ADDITION-1-CALENDAR.md) |
 
 ## Where things are
 

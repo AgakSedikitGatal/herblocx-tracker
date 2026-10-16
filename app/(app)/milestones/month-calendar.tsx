@@ -1,7 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { requireProfile } from "@/lib/auth";
 import {
   WEEKDAYS,
   isSameMonth,
@@ -16,7 +15,6 @@ import type { Enums } from "@/lib/database.types";
 import { formatDate, jakartaToday } from "@/lib/format";
 import { getPeople } from "@/lib/people";
 import { createClient } from "@/lib/supabase/server";
-import { MilestoneViewTabs } from "../view-tabs";
 
 const VISIBLE_PER_DAY = 3;
 
@@ -32,11 +30,10 @@ type CalendarItem =
       assignee: string;
     };
 
-// Month view of every task's due date and every milestone's end date.
-// Nothing is entered here by hand: it is all read from the tasks and milestones.
-export default async function MilestoneCalendarPage({ searchParams }: PageProps<"/milestones/calendar">) {
-  await requireProfile();
-  const { month: monthParam } = await searchParams;
+// Month view of every task's due date and every milestone's end date, shown at the top of
+// the Milestones page. Nothing is entered here by hand: it is all read from the tasks and
+// milestones. `monthParam` is the page's ?month=YYYY-MM.
+export async function MonthCalendar({ monthParam }: { monthParam: unknown }) {
   const today = jakartaToday();
   const { year, month } = parseMonth(monthParam, today);
   const weeks = monthGrid(year, month);
@@ -81,22 +78,19 @@ export default async function MilestoneCalendarPage({ searchParams }: PageProps<
   const overdueInMonth = inMonth.filter((t) => t.is_overdue).length;
 
   return (
-    <div className="grid gap-4">
-      <h1 className="text-xl font-semibold">Milestones</h1>
-      <MilestoneViewTabs active="calendar" />
-
+    <section aria-label="Calendar" className="grid gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link href={`/milestones/calendar?month=${monthKey(+today.slice(0, 4), +today.slice(5, 7))}`}>Today</Link>
+            <Link href={`/milestones?month=${monthKey(+today.slice(0, 4), +today.slice(5, 7))}`}>Today</Link>
           </Button>
           <Button asChild variant="ghost" size="icon-sm" aria-label="Previous month">
-            <Link href={`/milestones/calendar?month=${shiftMonth(year, month, -1)}`}>
+            <Link href={`/milestones?month=${shiftMonth(year, month, -1)}`}>
               <ChevronLeft />
             </Link>
           </Button>
           <Button asChild variant="ghost" size="icon-sm" aria-label="Next month">
-            <Link href={`/milestones/calendar?month=${shiftMonth(year, month, 1)}`}>
+            <Link href={`/milestones?month=${shiftMonth(year, month, 1)}`}>
               <ChevronRight />
             </Link>
           </Button>
@@ -146,7 +140,7 @@ export default async function MilestoneCalendarPage({ searchParams }: PageProps<
           <span className="size-1.5 rounded-full bg-amber-500" aria-hidden="true" /> High priority
         </span>
       </p>
-    </div>
+    </section>
   );
 }
 

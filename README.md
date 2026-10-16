@@ -8,7 +8,7 @@ Internal project tracker for the HerblocX project, for about 10–12 people on a
 |---|---|
 | Dashboard: tasks by status, overdue tasks, milestone progress, workload per person, recent activity | **Dashboard** (home page) |
 | Kanban board (To Do → In Progress → Review → Done) with drag and drop and filters | **Board** |
-| Milestones with a timeline, automatic progress, and a **month calendar** of all deadlines | **Milestones** (Timeline / Calendar tabs) |
+| A **month calendar** of all deadlines, then milestones with a timeline and automatic progress | **Milestones** |
 | Comments, task history and file/link attachments on every task | Open any task |
 | Append-only activity log | **Activity** |
 | Account management (Admin only) | **Users** |
