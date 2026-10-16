@@ -1,7 +1,7 @@
 // Creates the starting accounts in the Supabase project named in .env.local.
 //
-//   npm run seed        -> development project: 1 Admin + 1 test account per job role
-//   npm run seed:live   -> live project: only the Admin account
+//   npm run seed        -> development project (.env.local): 1 Admin + 1 test account per job role
+//   npm run seed:live   -> live project (.env.production.local): only the Admin account
 //
 // Passwords are generated at random and written to seed-credentials.local.md
 // (never committed to git). Running it again skips accounts that already exist.
@@ -13,11 +13,17 @@ import { appendFileSync, existsSync, readFileSync } from "node:fs";
 const DOMAIN = "herblocx.internal";
 const CREDENTIALS_FILE = "seed-credentials.local.md";
 
-loadEnvFile(".env.local");
+const envFlag = process.argv.indexOf("--env");
+const envFile = envFlag > -1 ? process.argv[envFlag + 1] : ".env.local";
+if (!existsSync(envFile)) {
+  console.error(`Settings file ${envFile} not found.`);
+  process.exit(1);
+}
+loadEnvFile(envFile);
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const secretKey = process.env.SUPABASE_SECRET_KEY;
 if (!url || !secretKey) {
-  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY in .env.local.");
+  console.error(`Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY in ${envFile}.`);
   process.exit(1);
 }
 

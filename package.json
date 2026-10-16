@@ -13,9 +13,11 @@
     "typecheck": "next typegen && tsc --noEmit",
     "db:push": "supabase db push",
     "seed": "node scripts/seed.mjs",
-    "seed:live": "node scripts/seed.mjs --admin-only",
+    "seed:live": "node scripts/seed.mjs --admin-only --env .env.production.local",
     "db:types": "supabase gen types typescript --linked --schema public > lib/database.types.ts",
-    "test": "node --test --test-concurrency=1 --test-reporter=spec tests/*.test.mjs"
+    "test": "node --test --test-concurrency=1 --test-reporter=spec tests/*.test.mjs",
+    "backup": "node scripts/backup.mjs",
+    "backup:live": "node scripts/backup.mjs --env .env.production.local"
   },
   "dependencies": {
     "@dnd-kit/core": "6.3.1",

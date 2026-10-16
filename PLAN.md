@@ -229,6 +229,16 @@ Every phase ends with: what was done, plain-language browser test steps, a git c
   - Free, and enough for this app.
   - Reminder, already noted: Vercel's terms say Hobby is for non-commercial use. You chose it knowingly. Upgrading later only needs a plan change, with no code changes.
 
+### Later decisions (2026-10-16)
+
+| Decision | Detail |
+|---|---|
+| Code on GitHub | Public repo `AgakSedikitGatal/herblocx-tracker`; Vercel builds from it |
+| Test tool | Node.js built-in test runner instead of `vitest` (npm crashed installing vitest); no new packages |
+| Free-plan room | Older project "AgakSedikitGatal's Project" paused so `herblocx-prod` could be created |
+| Website database | Stays on `herblocx-dev` until the owner switches (see docs/DEPLOY_VERCEL.md) |
+| Per-phase documentation | `docs/phases/PHASE-N.md` for every phase |
+
 ---
 
-*Phase 1 started 2026-10-15.*
+*All phases (0–5) completed 2026-10-16.*

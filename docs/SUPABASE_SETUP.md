@@ -4,7 +4,10 @@
 > deployed the app to https://herblocx-tracker.vercel.app using the Supabase and Vercel connectors.
 > Project ref: `ieieeklmyircdgjduvkx`. `.env.local` already holds the URL and publishable key.
 > **Still to do by you:** Part B (sign-ups off), paste the secret key (Part C step 3) into `.env.local`
-> and into Vercel, then Part F (seed). The full guide below stays as the recipe for the live project in Phase 5.
+> and into Vercel, then Part F (seed). ✅ All done on 2026-10-16.
+>
+> **Live project `herblocx-prod`** (ref `wsodkxhhwmmdeitnxmzi`) was created on 2026-10-16 with all 5 database files.
+> Its one-time steps (sign-ups off, secret key, `npm run seed:live`) are in [DEPLOY_VERCEL.md](DEPLOY_VERCEL.md).
 
 This sets up the **development & testing** project, `herblocx-dev`. You'll repeat the same steps for the live project (`herblocx-prod`) in Phase 5.
 

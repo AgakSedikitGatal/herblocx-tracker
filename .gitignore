@@ -18,3 +18,6 @@ out/
 # TypeScript / Next.js generated
 *.tsbuildinfo
 next-env.d.ts
+
+# Local backups (contain all project data): never commit
+backups/
