@@ -9,8 +9,8 @@ export default async function HomePage() {
       <CardHeader>
         <CardTitle className="text-lg">Welcome, {profile.full_name}</CardTitle>
         <CardDescription>
-          You are logged in. Milestones, the task board and the dashboard will appear here in the
-          next phases.
+          Use <strong>Board</strong> for tasks and <strong>Milestones</strong> for the timeline (top
+          menu). The dashboard will appear here in a later phase.
         </CardDescription>
       </CardHeader>
       <CardContent />

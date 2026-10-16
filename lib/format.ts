@@ -34,3 +34,9 @@ export function formatDateTime(value: string | null | undefined) {
 export function formatDateOfTimestamp(value: string | null | undefined) {
   return formatDateTime(value).slice(0, 10);
 }
+
+// Today's date in Jakarta as "2026-10-15" (the format date inputs and the database use).
+export function jakartaToday() {
+  const p = partsOf(new Date());
+  return `${p.year}-${p.month}-${p.day}`;
+}

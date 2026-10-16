@@ -19,6 +19,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             <Link href="/" className="text-muted-foreground hover:text-foreground">
               Home
             </Link>
+            <Link href="/board" className="text-muted-foreground hover:text-foreground">
+              Board
+            </Link>
+            <Link href="/milestones" className="text-muted-foreground hover:text-foreground">
+              Milestones
+            </Link>
             {profile.is_admin && (
               <Link href="/admin/users" className="text-muted-foreground hover:text-foreground">
                 Users
