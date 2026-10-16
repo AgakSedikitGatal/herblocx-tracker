@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ActivityList } from "@/components/activity-list";
 import { DeleteButton } from "@/components/delete-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireProfile } from "@/lib/auth";
+import { actorName, describeActivity } from "@/lib/activity";
 import { jobRoleLabel, taskPriorityLabel, taskStatusLabel } from "@/lib/constants";
 import { formatDate, formatDateTime, jakartaToday } from "@/lib/format";
 import { getPeople } from "@/lib/people";
@@ -11,20 +13,30 @@ import { canDeleteTask, canEditTask } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { deleteTask, updateTask } from "../actions";
 import { TaskForm } from "../task-form";
+import { Comments } from "./comments";
 
 export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
   const viewer = await requireProfile();
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: task }, people, { data: milestones }] = await Promise.all([
-    supabase.from("tasks").select("*").eq("id", id).maybeSingle(),
-    getPeople(supabase),
-    supabase.from("milestones").select("id, title").order("start_date"),
-  ]);
+  const [{ data: task }, people, { data: milestones }, { data: comments }, { data: history }] =
+    await Promise.all([
+      supabase.from("tasks").select("*").eq("id", id).maybeSingle(),
+      getPeople(supabase),
+      supabase.from("milestones").select("id, title").order("start_date"),
+      supabase.from("task_comments").select("*").eq("task_id", id).order("created_at"),
+      supabase
+        .from("activity_log")
+        .select("*")
+        .eq("task_id", id)
+        .order("id", { ascending: false })
+        .limit(200),
+    ]);
   if (!task) notFound();
 
   const milestoneName = new Map((milestones ?? []).map((m) => [m.id, m.title]));
+  const lookups = { nameOf: people.nameOf, milestoneTitle: (mid: string) => milestoneName.get(mid) };
   const canEdit = canEditTask(viewer, task);
   const overdue = task.status !== "done" && task.due_date < jakartaToday();
 
@@ -101,6 +113,46 @@ export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
               </p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Comments</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Comments
+            taskId={task.id}
+            comments={(comments ?? []).map((c) => ({
+              id: c.id,
+              authorName: people.nameOf(c.author_id) ?? "Unknown",
+              body: c.body,
+              createdAt: formatDateTime(c.created_at),
+              edited: c.edited_at !== null,
+              canEdit: c.author_id === viewer.id,
+              canDelete: c.author_id === viewer.id || viewer.is_admin,
+            }))}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>History</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          <ActivityList
+            showTask={false}
+            rows={(history ?? []).map((entry) => ({
+              id: entry.id,
+              actor: actorName(entry, lookups),
+              sentence: describeActivity(entry, lookups),
+              when: formatDateTime(entry.created_at),
+            }))}
+          />
+          <p className="text-xs text-muted-foreground">
+            Recorded automatically by the database. Nobody can edit or delete history entries.
+          </p>
         </CardContent>
       </Card>
 

@@ -57,6 +57,7 @@ function toRow(v: z.infer<typeof taskSchema>) {
 function revalidateTaskPages(taskId?: string) {
   revalidatePath("/board");
   revalidatePath("/milestones", "layout");
+  revalidatePath("/activity");
   if (taskId) revalidatePath(`/tasks/${taskId}`);
 }
 
