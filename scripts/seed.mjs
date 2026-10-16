@@ -47,35 +47,59 @@ let failed = false;
 for (const account of accounts) {
   const email = `${account.username}@${DOMAIN}`;
   const password = randomBytes(12).toString("base64url");
+  let userId;
+  let label = "created";
 
-  const { data, error } = await supabase.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { full_name: account.fullName, job_role: account.jobRole },
-  });
-  if (error) {
-    if (error.code === "email_exists") {
+  const { data, error } = await withRetry(() =>
+    supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { full_name: account.fullName, job_role: account.jobRole },
+    }),
+  );
+  if (error?.code === "email_exists") {
+    // A profile that was never updated was never switched on: an earlier run was cut off
+    // half-way (e.g. by a dropped connection). Finish it with a fresh password.
+    const { data: profile } = await withRetry(() =>
+      supabase.from("profiles").select("id, created_at, updated_at").eq("email", email).maybeSingle(),
+    );
+    if (!profile || profile.created_at !== profile.updated_at) {
       console.log(`  skip    ${account.username} (already exists, password unchanged)`);
       continue;
     }
+    const { error: passwordError } = await withRetry(() =>
+      supabase.auth.admin.updateUserById(profile.id, { password }),
+    );
+    if (passwordError) {
+      console.error(`  FAILED  ${account.username}: ${passwordError.message}`);
+      failed = true;
+      continue;
+    }
+    userId = profile.id;
+    label = "finished";
+  } else if (error) {
     console.error(`  FAILED  ${account.username}: ${error.message}`);
     failed = true;
     continue;
+  } else {
+    userId = data.user.id;
   }
 
   // New accounts start switched off (database safety rule). Switch this one on.
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .update({ is_active: true, is_admin: Boolean(account.isAdmin) })
-    .eq("id", data.user.id);
+  const { error: profileError } = await withRetry(() =>
+    supabase
+      .from("profiles")
+      .update({ is_active: true, is_admin: Boolean(account.isAdmin) })
+      .eq("id", userId),
+  );
   if (profileError) {
     console.error(`  FAILED  ${account.username}: account created but not activated: ${profileError.message}`);
     failed = true;
     continue;
   }
 
-  console.log(`  created ${account.username}${account.isAdmin ? " (Admin)" : ""}`);
+  console.log(`  ${label.padEnd(7)} ${account.username}${account.isAdmin ? " (Admin)" : ""}`);
   created.push({ ...account, password });
 }
 
@@ -98,6 +122,20 @@ if (created.length > 0) {
   console.log(`\nPasswords saved to ${CREDENTIALS_FILE}`);
 }
 process.exit(failed ? 1 : 0);
+
+// Repeats a Supabase call when the internet connection drops, up to 5 tries.
+async function withRetry(call) {
+  for (let attempt = 1; ; attempt++) {
+    const result = await call();
+    const error = result.error;
+    const isNetworkError =
+      error &&
+      (error.name === "AuthRetryableFetchError" ||
+        /fetch failed|network|ECONN|ETIMEDOUT/i.test(error.message ?? ""));
+    if (!isNetworkError || attempt === 5) return result;
+    await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
+  }
+}
 
 function loadEnvFile(path) {
   if (!existsSync(path)) return;
