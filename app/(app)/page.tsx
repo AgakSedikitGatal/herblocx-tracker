@@ -2,6 +2,7 @@ import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { ActivityList } from "@/components/activity-list";
 import { ProgressBar } from "@/components/progress-bar";
+import { STATUS_STYLES } from "@/components/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toActivityRows } from "@/lib/activity-rows";
 import { requireProfile } from "@/lib/auth";
@@ -65,7 +66,13 @@ export default async function DashboardPage() {
       {/* Tasks by status, plus overdue */}
       <section aria-label="Tasks by status" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {TASK_STATUSES.map((s) => (
-          <StatTile key={s.value} label={s.label} value={countByStatus.get(s.value) ?? 0} href="/board" />
+          <StatTile
+            key={s.value}
+            label={s.label}
+            value={countByStatus.get(s.value) ?? 0}
+            href="/board"
+            tone={`${STATUS_STYLES[s.value].border} ${STATUS_STYLES[s.value].text}`}
+          />
         ))}
         <StatTile
           label="Overdue"
@@ -203,29 +210,32 @@ export default async function DashboardPage() {
   );
 }
 
+// `tone` = the status colour classes (top border + label colour).
 function StatTile({
   label,
   value,
   href,
   alert = false,
+  tone = "",
 }: {
   label: string;
   value: number;
   href: string;
   alert?: boolean;
+  tone?: string;
 }) {
   return (
     <Link
       href={href}
-      className={`grid gap-1 rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50 ${
-        alert ? "border-destructive/50" : ""
+      className={`grid gap-1 rounded-xl border border-t-4 bg-card p-4 shadow-xs transition-colors hover:bg-accent/40 ${
+        alert ? "border-t-destructive text-destructive" : tone || "border-t-border"
       }`}
     >
-      <span className={`flex items-center gap-1 text-xs ${alert ? "text-destructive" : "text-muted-foreground"}`}>
+      <span className="flex items-center gap-1 text-xs font-medium">
         {alert && <TriangleAlert className="size-3.5" aria-hidden="true" />}
         {label}
       </span>
-      <span className="text-2xl font-semibold tabular-nums">{value}</span>
+      <span className="text-2xl font-semibold text-foreground tabular-nums">{value}</span>
     </Link>
   );
 }

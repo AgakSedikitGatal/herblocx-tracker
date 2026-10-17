@@ -2,12 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActivityList } from "@/components/activity-list";
 import { DeleteButton } from "@/components/delete-button";
+import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireProfile } from "@/lib/auth";
-import { actorName, describeActivity } from "@/lib/activity";
+import { toActivityRows } from "@/lib/activity-rows";
 import { formatBytes } from "@/lib/attachments";
-import { jobRoleLabel, taskPriorityLabel, taskStatusLabel } from "@/lib/constants";
+import { jobRoleLabel, taskPriorityLabel } from "@/lib/constants";
 import { formatDate, formatDateTime, jakartaToday } from "@/lib/format";
 import { getPeople } from "@/lib/people";
 import { canDeleteAttachment, canDeleteTask, canEditTask } from "@/lib/permissions";
@@ -45,7 +46,7 @@ export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
   if (!task) notFound();
 
   const milestoneName = new Map((milestones ?? []).map((m) => [m.id, m.title]));
-  const lookups = { nameOf: people.nameOf, milestoneTitle: (mid: string) => milestoneName.get(mid) };
+  const historyRows = await toActivityRows(supabase, history ?? [], people);
   const canEdit = canEditTask(viewer, task);
   const overdue = task.status !== "done" && task.due_date < jakartaToday();
 
@@ -57,7 +58,7 @@ export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
       <div className="grid gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-xl font-semibold">{task.title}</h1>
-          <Badge variant="secondary">{taskStatusLabel(task.status)}</Badge>
+          <StatusBadge status={task.status} />
           {overdue && <Badge variant="destructive">Overdue</Badge>}
         </div>
         <p className="text-sm text-muted-foreground">
@@ -174,15 +175,7 @@ export default async function TaskPage({ params }: PageProps<"/tasks/[id]">) {
           <CardTitle>History</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3">
-          <ActivityList
-            showTask={false}
-            rows={(history ?? []).map((entry) => ({
-              id: entry.id,
-              actor: actorName(entry, lookups),
-              sentence: describeActivity(entry, lookups),
-              when: formatDateTime(entry.created_at),
-            }))}
-          />
+          <ActivityList showTask={false} rows={historyRows} />
           <p className="text-xs text-muted-foreground">
             Recorded automatically by the database. Nobody can edit or delete history entries.
           </p>

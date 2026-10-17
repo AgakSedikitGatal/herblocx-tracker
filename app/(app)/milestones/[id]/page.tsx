@@ -2,10 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DeleteButton } from "@/components/delete-button";
 import { ProgressBar } from "@/components/progress-bar";
+import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireProfile } from "@/lib/auth";
-import { taskStatusLabel } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { getPeople } from "@/lib/people";
 import { canDeleteMilestone, canEditMilestone } from "@/lib/permissions";
@@ -63,7 +63,7 @@ export default async function MilestonePage({ params }: PageProps<"/milestones/[
             <ul className="grid gap-2">
               {tasks.map((task) => (
                 <li key={task.id} className="flex flex-wrap items-center gap-2 text-sm">
-                  <Badge variant="outline">{task.status ? taskStatusLabel(task.status) : ""}</Badge>
+                  {task.status && <StatusBadge status={task.status} />}
                   <Link href={`/tasks/${task.id}`} className="font-medium hover:underline">
                     {task.title}
                   </Link>

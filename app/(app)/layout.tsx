@@ -4,42 +4,31 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { requireProfile } from "@/lib/auth";
 import { APP_NAME, jobRoleLabel } from "@/lib/constants";
+import { NavLinks } from "./nav-links";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const profile = await requireProfile();
 
   return (
     <div className="flex min-h-svh flex-col">
-      <header className="border-b bg-background">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-          <Link href="/" className="font-semibold">
+      <header className="border-b bg-card">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            <span
+              aria-hidden="true"
+              className="flex size-7 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground"
+            >
+              H
+            </span>
             {APP_NAME}
           </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link href="/" className="text-muted-foreground hover:text-foreground">
-              Dashboard
-            </Link>
-            <Link href="/board" className="text-muted-foreground hover:text-foreground">
-              Board
-            </Link>
-            <Link href="/milestones" className="text-muted-foreground hover:text-foreground">
-              Milestones
-            </Link>
-            <Link href="/activity" className="text-muted-foreground hover:text-foreground">
-              Activity
-            </Link>
-            {profile.is_admin && (
-              <Link href="/admin/users" className="text-muted-foreground hover:text-foreground">
-                Users
-              </Link>
-            )}
-          </nav>
+          <NavLinks isAdmin={profile.is_admin} />
           <div className="ml-auto flex items-center gap-3 text-sm">
             <span>
               {profile.full_name}{" "}
               <span className="text-muted-foreground">· {jobRoleLabel(profile.job_role)}</span>
             </span>
-            {profile.is_admin && <Badge variant="secondary">Admin</Badge>}
+            {profile.is_admin && <Badge className="bg-accent text-accent-foreground">Admin</Badge>}
             <Link href="/account" className="text-muted-foreground hover:text-foreground">
               Change password
             </Link>

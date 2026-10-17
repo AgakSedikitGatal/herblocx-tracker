@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useId, useState, useTransition } from "react";
 import { moveTask } from "@/app/(app)/tasks/actions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { STATUS_STYLES, StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { TASK_STATUSES, taskPriorityLabel } from "@/lib/constants";
 import type { Enums } from "@/lib/database.types";
@@ -110,18 +111,22 @@ function Column({
     <section
       ref={setNodeRef}
       aria-label={label}
-      className={`flex min-h-64 flex-col gap-2 rounded-lg border p-2 transition-colors ${isOver ? "bg-muted" : "bg-muted/40"}`}
+      className={`flex min-h-64 flex-col gap-2 rounded-lg border border-t-4 p-2 transition-colors ${STATUS_STYLES[status].border} ${
+        isOver ? "bg-accent/60 ring-2 ring-primary/30" : "bg-muted/60"
+      }`}
     >
       <header className="flex items-center justify-between px-1 py-1">
-        <h2 className="text-sm font-semibold">{label}</h2>
-        <span className="text-xs text-muted-foreground">{tasks.length}</span>
+        <h2 className="text-sm">
+          <StatusBadge status={status} />
+        </h2>
+        <span className="text-xs font-medium text-muted-foreground">{tasks.length}</span>
       </header>
       {tasks.map((task) => (
         <Card key={task.id} task={task} today={today} />
       ))}
       <Link
         href={`/tasks/new?status=${status}`}
-        className="rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-background hover:text-foreground"
+        className="rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-card hover:text-foreground"
       >
         + Add task
       </Link>
@@ -143,7 +148,7 @@ function Card({ task, today }: { task: BoardTask; today: string }) {
       {...listeners}
       {...attributes}
       aria-roledescription={task.canEdit ? "draggable task" : "task"}
-      className={`grid gap-2 rounded-md border bg-background p-3 text-sm shadow-xs ${
+      className={`grid gap-2 rounded-md border bg-card p-3 text-sm shadow-xs ${
         task.canEdit ? "cursor-grab touch-none active:cursor-grabbing" : ""
       } ${isDragging ? "relative z-20 opacity-80 shadow-lg" : ""} ${overdue ? "border-destructive/60" : ""}`}
     >

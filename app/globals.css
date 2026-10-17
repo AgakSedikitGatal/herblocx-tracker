@@ -5,6 +5,18 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+    --color-status-todo: var(--status-todo);
+    --color-status-todo-foreground: var(--status-todo-foreground);
+    --color-status-todo-border: var(--status-todo-border);
+    --color-status-progress: var(--status-progress);
+    --color-status-progress-foreground: var(--status-progress-foreground);
+    --color-status-progress-border: var(--status-progress-border);
+    --color-status-review: var(--status-review);
+    --color-status-review-foreground: var(--status-review-foreground);
+    --color-status-review-border: var(--status-review-border);
+    --color-status-done: var(--status-done);
+    --color-status-done-foreground: var(--status-done-foreground);
+    --color-status-done-border: var(--status-done-border);
     --font-heading: var(--font-sans);
     --font-sans: var(--font-sans);
     --color-sidebar-ring: var(--sidebar-ring);
@@ -48,24 +60,24 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
+    --background: #f5f7f6; /* soft tinted page; cards stay white */
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
+    --primary: #0f6e56; /* HerblocX herbal green */
+    --primary-foreground: #ffffff;
+    --secondary: #eef2f0;
     --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    --muted: #eef2f0;
+    --muted-foreground: oklch(0.5 0 0);
+    --accent: #e1f5ee;
+    --accent-foreground: #085041;
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --border: #e2e6e4;
+    --input: #d5dbd8;
+    --ring: #1d9e75;
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
@@ -80,6 +92,20 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    /* Task status colours: used the same way on the board, dashboard, activity and calendar */
+    --status-todo: #f1efe8;
+    --status-todo-foreground: #444441;
+    --status-todo-border: #b4b2a9;
+    --status-progress: #e6f1fb;
+    --status-progress-foreground: #0c447c;
+    --status-progress-border: #378add;
+    --status-review: #faeeda;
+    --status-review-foreground: #633806;
+    --status-review-border: #ef9f27;
+    --status-done: #eaf3de;
+    --status-done-foreground: #27500a;
+    --status-done-border: #639922;
 }
 
 

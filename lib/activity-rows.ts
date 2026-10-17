@@ -1,6 +1,6 @@
 import type { ActivityRow } from "@/components/activity-list";
 import { actorName, describeActivity, type ActivityEntry } from "@/lib/activity";
-import { formatDateTime } from "@/lib/format";
+import { formatDateOfTimestamp, formatTimeOfTimestamp } from "@/lib/format";
 import type { getPeople } from "@/lib/people";
 import type { createClient } from "@/lib/supabase/server";
 
@@ -27,8 +27,9 @@ export async function toActivityRows(
   return entries.map((entry) => ({
     id: entry.id,
     actor: actorName(entry, lookups),
-    sentence: describeActivity(entry, lookups),
-    when: formatDateTime(entry.created_at),
+    ...describeActivity(entry, lookups),
+    day: formatDateOfTimestamp(entry.created_at),
+    time: formatTimeOfTimestamp(entry.created_at),
     taskTitle: entry.task_title,
     taskHref: entry.task_id && live.has(entry.task_id) ? `/tasks/${entry.task_id}` : null,
   }));

@@ -16,6 +16,7 @@ One document per development phase. Each has a plain-language part for users and
 | # | Topic | Status | Document |
 |---|---|---|---|
 | 1 | Milestones **calendar** (top of the Milestones page): Google-Calendar-style month view, filled in automatically from task due dates and milestone end dates | ✅ Done (2026-10-16) | [ADDITION-1-CALENDAR.md](ADDITION-1-CALENDAR.md) |
+| 2 | Readable **Activity** (grouped by day, one line per event, filters) and a **colour refresh** (herbal green brand, colour-coded statuses) | ✅ Done (2026-10-17) | [ADDITION-2-ACTIVITY-AND-COLOURS.md](ADDITION-2-ACTIVITY-AND-COLOURS.md) |
 
 ## Where things are
 

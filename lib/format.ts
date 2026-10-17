@@ -40,3 +40,21 @@ export function jakartaToday() {
   const p = partsOf(new Date());
   return `${p.year}-${p.month}-${p.day}`;
 }
+
+// A moment in time -> its Jakarta clock time, "14:30".
+export function formatTimeOfTimestamp(value: string | null | undefined) {
+  return formatDateTime(value).slice(11);
+}
+
+const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+// "2026/10/16" -> "Today" / "Yesterday" / "Mon, 2026/10/12" (relative to today in Jakarta).
+export function dayLabel(day: string) {
+  const today = jakartaToday().replaceAll("-", "/");
+  const [y, m, d] = day.split("/").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const yesterday = new Date(Date.parse(today.replaceAll("/", "-")) - 86_400_000).toISOString().slice(0, 10).replaceAll("-", "/");
+  if (day === today) return "Today";
+  if (day === yesterday) return "Yesterday";
+  return `${WEEKDAY_NAMES[date.getUTCDay()]}, ${day}`;
+}
